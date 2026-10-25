@@ -35,6 +35,8 @@ jobs:
           & "dist/Reclaimer Launcher.exe" --version
           New-Item -ItemType Directory -Force release | Out-Null
           Copy-Item "dist/Reclaimer Launcher.exe" "release/Reclaimer-Launcher-Windows.exe"
+          $h = (Get-FileHash "release/Reclaimer-Launcher-Windows.exe" -Algorithm SHA256).Hash.ToLower()
+          Set-Content -NoNewline -Encoding ascii "release/Reclaimer-Launcher-Windows.exe.sha256" "$h  Reclaimer-Launcher-Windows.exe`n"
 
       - name: Build (macOS / Linux)
         if: runner.os != 'Windows'
@@ -52,3 +54,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: release/*
+          # Keep files already on the release (e.g. a Windows exe uploaded by hand)
+          overwrite_files: false

@@ -32,6 +32,11 @@ else
   tar -C dist -czf "release/reclaimer-launcher-linux-$(uname -m).tar.gz" reclaimer-launcher
 fi
 
+# One checksum file per download, e.g. reclaimer-launcher-linux-x86_64.tar.gz.sha256
+(cd release && for f in *; do
+  if command -v sha256sum >/dev/null; then sha256sum "$f"; else shasum -a 256 "$f"; fi > "$f.sha256"
+done)
+
 deactivate
 echo
 echo "Done:"

@@ -7,8 +7,8 @@ for Windows, macOS and Linux.
 
 Grab the latest build from the
 [Releases page](https://github.com/Kungpow1989/Project-Reclaimer-Launcher/releases/latest).
-Each release lists SHA-256 checksums in `SHA256SUMS.txt` so you can check
-your download:
+Each download has a matching `.sha256` file with its SHA-256 checksum so you
+can check it:
 
 ```
 Get-FileHash Reclaimer-Launcher-Windows.exe -Algorithm SHA256
