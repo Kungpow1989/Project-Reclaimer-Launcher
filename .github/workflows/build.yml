@@ -1,0 +1,54 @@
+name: Build launcher
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+          - os: macos-latest      # Apple Silicon
+          - os: ubuntu-22.04      # older glibc, so the binary runs on more distros
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pyinstaller -r requirements.txt
+          python -m PyInstaller --noconfirm --clean --onefile --noconsole `
+            --name "Reclaimer Launcher" --icon assets/icon.ico `
+            --add-data "assets;assets" --hidden-import PIL._tkinter_finder launcher.py
+          & "dist/Reclaimer Launcher.exe" --version
+          New-Item -ItemType Directory -Force release | Out-Null
+          Copy-Item "dist/Reclaimer Launcher.exe" "release/Reclaimer-Launcher-Windows.exe"
+
+      - name: Build (macOS / Linux)
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x build.sh
+          PYTHON=python ./build.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Reclaimer-Launcher-${{ runner.os }}
+          path: release/*
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*

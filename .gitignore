@@ -1,0 +1,10 @@
+build/
+dist/
+release/
+.venv-build/
+__pycache__/
+*.spec
+launcher.ini
+launcher.log
+launcher_state.json
+project-reclaimer-client.exe*
